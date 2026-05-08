@@ -4,12 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { LPP_DATABASE, fuzzySearch } from '@/lib/lpp-database';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-import { Search, Database, CheckCircle2, Zap, LogIn, LogOut, User, Bed, Armchair, Activity, Package, X } from 'lucide-react';
+import { Search, LogIn, LogOut, User, Bed, Armchair, Activity, Package, X, Heart, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-type CategoryFilter = 'all' | 'Lits médicalisés' | 'Lève-personnes' | 'Matelas thérapeutiques' | 'Fauteuils releveurs' | 'Accessoires lits';
+type CategoryFilter = 'all' | 'Lits médicalisés' | 'Lève-personnes' | 'Matelas thérapeutiques' | 'Fauteuils releveurs' | 'Accessoires lits' | 'Forfaits prestations';
 
 export default function HomePage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [modeFilter, setModeFilter] = useState<'all' | 'location' | 'achat'>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
@@ -28,7 +30,6 @@ export default function HomePage() {
   useEffect(() => {
     let filtered = fuzzySearch(searchQuery, modeFilter);
     
-    // Filtre par catégorie
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(p => p.sousCategorie === categoryFilter);
     }
@@ -43,6 +44,10 @@ export default function HomePage() {
     }
   };
 
+  const handleLoginClick = () => {
+    router.push('/login');
+  };
+
   const resetFilters = () => {
     setSearchQuery('');
     setModeFilter('all');
@@ -55,9 +60,10 @@ export default function HomePage() {
     { value: 'all', label: 'Tous', icon: Package, color: 'bg-gray-100 text-gray-700' },
     { value: 'Lits médicalisés', label: 'Lits', icon: Bed, color: 'bg-blue-100 text-blue-700' },
     { value: 'Lève-personnes', label: 'Lève-personnes', icon: Activity, color: 'bg-purple-100 text-purple-700' },
-    { value: 'Matelas thérapeutiques', label: 'Matelas', icon: Bed, color: 'bg-pink-100 text-pink-700' },
+    { value: 'Matelas thérapeutiques', label: 'Matelas', icon: Heart, color: 'bg-pink-100 text-pink-700' },
     { value: 'Fauteuils releveurs', label: 'Fauteuils', icon: Armchair, color: 'bg-amber-100 text-amber-700' },
     { value: 'Accessoires lits', label: 'Accessoires', icon: Package, color: 'bg-teal-100 text-teal-700' },
+    { value: 'Forfaits prestations', label: 'Forfaits', icon: ClipboardList, color: 'bg-purple-100 text-purple-700' },
   ];
 
   return (
@@ -66,7 +72,7 @@ export default function HomePage() {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-psad-blue-600 to-psad-blue-700 rounded-lg flex items-center justify-center text-white font-bold">
                 📋
               </div>
@@ -74,7 +80,7 @@ export default function HomePage() {
                 <h1 className="text-xl md:text-2xl font-bold text-psad-blue-600">PSAD LPP Manager</h1>
                 <p className="text-xs text-gray-600 hidden md:block">Gestion LPPR - Titre I Chapitre 2</p>
               </div>
-            </div>
+            </Link>
             
             {user ? (
               <div className="flex items-center gap-3">
@@ -88,12 +94,10 @@ export default function HomePage() {
                 </Button>
               </div>
             ) : (
-              <Link href="/login">
-                <Button variant="psad">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Connexion
-                </Button>
-              </Link>
+              <Button onClick={handleLoginClick} variant="psad">
+                <LogIn className="w-4 h-4 mr-2" />
+                Connexion
+              </Button>
             )}
           </div>
         </div>
@@ -153,7 +157,7 @@ export default function HomePage() {
         </div>
 
         {/* Filtres mode acquisition */}
-        <div className="max-w-4xl mx-auto mb-8">
+        <div className="max-w-4xl mx-auto mb-6">
           <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Mode d'acquisition</p>
             <div className="flex items-center justify-start gap-2 flex-wrap">
@@ -203,48 +207,13 @@ export default function HomePage() {
             </button>
           </div>
         )}
-
-        {/* Features (visible si pas de recherche) */}
-        {!hasActiveFilters && (
-          <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Database className="w-6 h-6 text-psad-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Base LPPR complète</h3>
-              <p className="text-sm text-gray-600">
-                {LPP_DATABASE.length}+ produits avec codes officiels et tarifs à jour
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Checklists interactives</h3>
-              <p className="text-sm text-gray-600">
-                Validez automatiquement tous les critères de facturation LPPR
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-orange-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Support MAD 24/7</h3>
-              <p className="text-sm text-gray-600">
-                Chatbot expert pour maintenance et dépannage
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Results */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Results - direct, sans cards intermédiaires */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="mb-6">
           <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-            {searchQuery ? `Résultats pour "${searchQuery}"` : 'Tous les produits'}
+            {searchQuery ? `Résultats pour "${searchQuery}"` : 'Catalogue LPP'}
             {categoryFilter !== 'all' && (
               <span className="text-base font-normal text-gray-600 ml-2">
                 · {categoryFilter}

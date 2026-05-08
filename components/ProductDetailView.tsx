@@ -14,8 +14,6 @@ import {
   Info,
   Download,
   MessageSquare,
-  Paperclip,
-  Clock,
   Shield,
   Repeat,
   ShoppingCart,
@@ -29,6 +27,7 @@ import {
   ClipboardCheck,
   ArrowRight,
   ExternalLink,
+  Euro,
 } from 'lucide-react';
 import { BillingChecklist } from './BillingChecklist';
 import { MaintenanceBot } from './MaintenanceBot';
@@ -37,7 +36,6 @@ interface ProductDetailViewProps {
   product: LPPProduct;
 }
 
-// Mapping des icônes pour les prestations
 const PRESTATION_ICONS = {
   delivery: Truck,
   install: Wrench,
@@ -49,7 +47,6 @@ const PRESTATION_ICONS = {
   verification: ClipboardCheck,
 };
 
-// Labels périodicité
 const PERIODICITE_LABELS: Record<string, string> = {
   hebdomadaire: 'Hebdomadaire',
   mensuelle: 'Mensuelle',
@@ -69,46 +66,91 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Hero Banner avec mode acquisition */}
+      {/* ========================================================== */}
+      {/* MODE ACQUISITION ULTRA VISIBLE - BANNER COLORÉ EN HAUT     */}
+      {/* ========================================================== */}
+      <div className={`rounded-xl p-4 shadow-lg border-2 ${
+        product.modeAcquisition === 'location' ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-green-700' :
+        product.modeAcquisition === 'achat' ? 'bg-gradient-to-r from-orange-500 to-red-500 border-orange-700' :
+        'bg-gradient-to-r from-blue-500 to-purple-600 border-blue-700'
+      }`}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            {product.modeAcquisition === 'location' && (
+              <>
+                <div className="bg-white text-green-600 rounded-full p-3">
+                  <Repeat className="w-7 h-7" />
+                </div>
+                <div className="text-white">
+                  <div className="text-xs uppercase font-semibold opacity-90">Mode d'acquisition</div>
+                  <div className="text-2xl font-bold">LOCATION UNIQUEMENT</div>
+                </div>
+              </>
+            )}
+            {product.modeAcquisition === 'achat' && (
+              <>
+                <div className="bg-white text-orange-600 rounded-full p-3">
+                  <ShoppingCart className="w-7 h-7" />
+                </div>
+                <div className="text-white">
+                  <div className="text-xs uppercase font-semibold opacity-90">Mode d'acquisition</div>
+                  <div className="text-2xl font-bold">ACHAT UNIQUEMENT</div>
+                </div>
+              </>
+            )}
+            {product.modeAcquisition === 'location-achat' && (
+              <>
+                <div className="bg-white text-purple-600 rounded-full p-3">
+                  <Repeat className="w-7 h-7" />
+                </div>
+                <div className="text-white">
+                  <div className="text-xs uppercase font-semibold opacity-90">Mode d'acquisition</div>
+                  <div className="text-2xl font-bold">LOCATION OU ACHAT</div>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="text-white text-right">
+            {isLocation && product.tarifLocationMensuel && (
+              <div>
+                <div className="text-xs opacity-90">Location</div>
+                <div className="text-xl font-bold">{formatPrice(product.tarifLocationMensuel)}/mois</div>
+              </div>
+            )}
+            {isAchat && (
+              <div>
+                <div className="text-xs opacity-90">Achat</div>
+                <div className="text-xl font-bold">{formatPrice(product.tarifResponsabilite)}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Hero Banner */}
       <div className="bg-gradient-to-br from-psad-blue-600 via-psad-blue-700 to-psad-blue-800 text-white rounded-2xl p-6 md:p-8 shadow-xl">
-        {/* Badge Location/Achat très visible */}
-        <div className="flex items-center gap-3 mb-4">
-          {isLocation && (
-            <div className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-full shadow-lg">
-              <Repeat className="w-5 h-5" />
-              <span className="font-bold uppercase text-sm">Location</span>
-            </div>
-          )}
-          {isAchat && (
-            <div className="flex items-center gap-2 bg-orange-500 px-4 py-2 rounded-full shadow-lg">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="font-bold uppercase text-sm">Achat</span>
-            </div>
-          )}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           <Badge className="bg-white/20 text-white border-0">
             Titre {product.titre}.{product.chapitre}
           </Badge>
           <Badge className="bg-white/20 text-white border-0">{product.sousCategorie}</Badge>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">{product.libelle}</h1>
-            <div className="flex items-center gap-2 text-white/80 mb-4">
-              <span className="font-mono text-base md:text-lg">Code LPP : {product.code}</span>
-            </div>
-            <p className="text-white/90 leading-relaxed text-sm md:text-base">{product.description}</p>
-          </div>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">{product.libelle}</h1>
+        <div className="flex items-center gap-2 text-white/80 mb-4">
+          <span className="font-mono text-base md:text-lg">Code LPP : {product.code}</span>
         </div>
+        <p className="text-white/90 leading-relaxed text-sm md:text-base">{product.description}</p>
       </div>
 
-      {/* Tarification & Périodicité - SECTION CRITIQUE */}
+      {/* Tarification & Périodicité - 3 cartes critiques */}
       <div className="grid md:grid-cols-3 gap-4">
-        {/* Tarif */}
+        {/* Tarif détaillé */}
         <Card className="border-2 border-psad-blue-200">
           <CardHeader className="pb-3 bg-blue-50 rounded-t-lg">
             <CardTitle className="text-sm flex items-center gap-2 text-psad-blue-700">
-              💰 Tarif {isLocation && !isAchat ? 'forfaitaire' : 'responsabilité'}
+              <Euro className="w-4 h-4" />
+              Tarif {isLocation && !isAchat ? 'forfaitaire' : 'responsabilité'}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
@@ -117,10 +159,15 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 <div className="text-3xl font-bold text-psad-blue-600 mb-1">
                   {formatPrice(product.tarifLocationMensuel)}
                 </div>
-                <div className="text-sm text-gray-600">/mois</div>
+                <div className="text-sm text-gray-600">/ mois (location)</div>
                 {product.tarifLocationHebdo && (
                   <div className="text-xs text-gray-500 mt-2">
                     Soit {formatPrice(product.tarifLocationHebdo)}/semaine
+                  </div>
+                )}
+                {isAchat && (
+                  <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+                    Achat possible : {formatPrice(product.tarifResponsabilite)}
                   </div>
                 )}
               </div>
@@ -130,7 +177,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   {formatPrice(product.tarifResponsabilite)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {isAchat ? 'Achat unique' : 'Tarif de référence'}
+                  Achat unique
                 </div>
               </div>
             )}
@@ -168,12 +215,12 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
           </CardContent>
         </Card>
 
-        {/* Conditions critiques */}
+        {/* Conditions */}
         <Card className={`border-2 ${product.requiresPriorAuth ? 'border-red-200' : 'border-green-200'}`}>
           <CardHeader className={`pb-3 rounded-t-lg ${product.requiresPriorAuth ? 'bg-red-50' : 'bg-green-50'}`}>
             <CardTitle className={`text-sm flex items-center gap-2 ${product.requiresPriorAuth ? 'text-red-700' : 'text-green-700'}`}>
               <Shield className="w-4 h-4" />
-              Conditions de prise en charge
+              Conditions
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4 space-y-2">
@@ -194,7 +241,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
               )}
               <span className={product.requiresPriorAuth ? 'text-red-900 font-medium' : 'text-gray-600'}>
-                {product.requiresPriorAuth ? 'Entente préalable CPAM' : 'Pas d\'entente préalable'}
+                {product.requiresPriorAuth ? 'Entente préalable CPAM' : 'Pas d\'entente'}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
@@ -235,7 +282,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="font-medium text-gray-900 text-sm">{prestation.label}</span>
                       {prestation.obligatoire && (
                         <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">
@@ -274,7 +321,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="font-mono text-xs text-purple-700 bg-white px-2 py-0.5 rounded">
                         {forfait.code}
                       </span>
@@ -345,7 +392,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
         </Card>
       )}
 
-      {/* Conditions de prise en charge détaillées */}
+      {/* Conditions détaillées */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
