@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 17 24 39;
+
+    /* PSAD Blue Medical Theme */
+    --primary: 0 76 188; /* #004CBC - Bleu médical professionnel */
+    --primary-foreground: 255 255 255;
+
+    --secondary: 59 130 246; /* #3b82f6 - Bleu claire */
+    --secondary-foreground: 255 255 255;
+
+    --destructive: 220 38 38;
+    --destructive-foreground: 255 255 255;
+
+    --muted: 107 114 128;
+    --muted-foreground: 255 255 255;
+
+    --accent: 14 165 233; /* #0ea5e9 - Sky blue accent */
+    --accent-foreground: 15 23 42;
+
+    --popover: 255 255 255;
+    --popover-foreground: 17 24 39;
+
+    --card: 255 255 255;
+    --card-foreground: 17 24 39;
+
+    --border: 229 231 235; /* Gris très clair */
+    --input: 243 244 246;
+    --ring: 0 76 188;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 17 24 39;
+    --foreground: 243 244 246;
+
+    --primary: 59 130 246;
+    --primary-foreground: 17 24 39;
+
+    --secondary: 31 41 55;
+    --secondary-foreground: 243 244 246;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 17 24 39;
+
+    --muted: 107 114 128;
+    --muted-foreground: 243 244 246;
+
+    --accent: 14 165 233;
+    --accent-foreground: 243 244 246;
+
+    --popover: 31 41 55;
+    --popover-foreground: 243 244 246;
+
+    --card: 31 41 55;
+    --card-foreground: 243 244 246;
+
+    --border: 55 65 81;
+    --input: 55 65 81;
+    --ring: 59 130 246;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
+/* Custom Selection */
+::selection {
+  @apply bg-primary text-primary-foreground;
+}
+
+/* Focus visible styles */
+:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+}
+
+/* Medical-style card shadows */
+.card-shadow {
+  @apply shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+
+  body {
+    @apply bg-white text-black;
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+}
