@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, Mail, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { login } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,21 +20,17 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
 
-    if (email === 'demo@psad-france.fr' && password === 'Demo2024!') {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('psad_user', JSON.stringify({
-          email,
-          name: 'Utilisateur Démo',
-          role: 'user',
-          loggedAt: new Date().toISOString(),
-        }));
-      }
+    const result = login(email, password);
+
+    if (result.success) {
       router.push('/');
     } else {
-      setError('Email ou mot de passe incorrect. Utilisez les identifiants de démo ci-dessous.');
+      setError(result.error || 'Erreur de connexion');
     }
+
     setIsLoading(false);
   };
 
@@ -61,7 +59,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email professionnel
+                  Email
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -113,20 +111,31 @@ export default function LoginPage() {
                 Se connecter
               </Button>
 
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm font-semibold text-blue-900 mb-2">🎯 Mode Démo</p>
-                <p className="text-xs text-blue-800 mb-2">
-                  Email : <code className="bg-white px-1 rounded">demo@psad-france.fr</code>
-                </p>
-                <p className="text-xs text-blue-800 mb-3">
-                  Mot de passe : <code className="bg-white px-1 rounded">Demo2024!</code>
-                </p>
+              {/* Lien inscription */}
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white px-3 text-gray-500">ou</span>
+                </div>
+              </div>
+
+              <Link href="/register">
+                <Button type="button" variant="outline" size="lg" className="w-full">
+                  Créer un compte
+                </Button>
+              </Link>
+
+              {/* Demo credentials */}
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs font-semibold text-blue-900 mb-2">🎯 Compte démo</p>
                 <button
                   type="button"
                   onClick={fillDemoCredentials}
                   className="text-xs text-psad-blue-600 hover:underline font-medium"
                 >
-                  → Remplir automatiquement
+                  → Remplir avec demo@psad-france.fr / Demo2024!
                 </button>
               </div>
             </form>
